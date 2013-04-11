@@ -15,9 +15,9 @@ MESSAGE_URL = 'https://' + USER_TOKEN + '@api.flowdock.com/flows/' + ORG_NAME + 
 inbox_flow = Flowdock::Flow.new(
   :api_token => API_TOKEN,
   :external_user_name => "AnnounceBot",
-  :source => 'BotFoundry',
+  :source => 'Chat',
   :from => {
-    :name => 'AnnounceBot',
+    :name => 'Announcement',
     :address => EMAIL_ADDRESS
   }
 )
