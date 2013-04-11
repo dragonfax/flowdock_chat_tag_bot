@@ -1,0 +1,52 @@
+#!/usr/bin/env ruby
+
+require 'flowdock'
+require 'json'
+# 'pty' because curl buffers
+# and I'm too lazy to look up proper http streaming in ruby
+require 'pty' 
+
+require_relative 'config'
+require_relative 'secrets'
+
+STICKY_TAG = 'sticky'
+STREAM_URL = 'https://' + USER_TOKEN + '@stream.flowdock.com/flows/' + ORG_NAME + '/' + FLOW_NAME
+MESSAGE_URL = 'https://' + USER_TOKEN + '@api.flowdock.com/flows/' + ORG_NAME + '/' + FLOW_NAME + '/messages'
+
+inbox_flow = Flowdock::Flow.new(
+  :api_token => API_TOKEN,
+  :external_user_name => "AnnounceBot",
+  :source => 'BotFoundry',
+  :from => {
+    :name => 'AnnounceBot',
+    :address => EMAIL_ADDRESS
+  }
+)
+
+stream, w, pid = PTY.spawn 'curl', '-s', STREAM_URL
+w.close
+while ( line = stream.gets  )
+  
+  next if line =~ /^\s*$/
+  
+  event = JSON.load(line)
+  
+  if event['event'] == 'message' && event['tags'].include?(STICKY_TAG)
+    inbox_flow.push_to_team_inbox(
+        :subject => 'Announcement',
+        :content => event['content'],
+        :tags => event['tags'],
+    )
+  elsif event['event'] == 'tag-change' && event['content']['add'] && event['content']['add'].include?(STICKY_TAG)
+    message_id = event['content']['message']
+    message = JSON.load(`curl -s '#{MESSAGE_URL}/#{message_id}'`)
+    inbox_flow.push_to_team_inbox(
+        :subject => 'Announcement',
+        :content => message['content'],
+        :tags => message['tags'],
+    )
+  end
+  
+end
+stream.close
+
