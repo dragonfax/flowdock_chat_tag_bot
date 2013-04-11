@@ -9,7 +9,6 @@ require 'pty'
 require_relative 'config'
 require_relative 'secrets'
 
-STICKY_TAG = 'sticky'
 STREAM_URL = 'https://' + USER_TOKEN + '@stream.flowdock.com/flows/' + ORG_NAME + '/' + FLOW_NAME
 MESSAGE_URL = 'https://' + USER_TOKEN + '@api.flowdock.com/flows/' + ORG_NAME + '/' + FLOW_NAME + '/messages'
 

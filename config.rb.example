@@ -1,4 +1,5 @@
 
-FLOW_NAME = '???'
-ORG_NAME = '???'
-EMAIL_ADDRESS = '???'
+STICKY_TAG = 'sticky'
+FLOW_NAME = 'sandbox'
+ORG_NAME = 'zendesk'
+EMAIL_ADDRESS = 'user@host.com'
